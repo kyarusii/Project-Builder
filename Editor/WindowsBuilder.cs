@@ -5,26 +5,26 @@ using UnityEngine;
 
 namespace ProjectBuilder.Editor
 {
-    internal enum eBackendType
+    public enum eBackendType
     {
         MONO,
         IL2CPP,
         IL2CPP_SOLUTION,
     }
 
-    internal enum eShippingType
+    public enum eShippingType
     {
         RELEASE,
         DEVELOPMENT,
     }
 
-    internal enum eBuildType
+    public enum eBuildType
     {
         CLIENT,
         HEADLESS,
     }
     
-    internal static class WindowsBuilder
+    public static class WindowsBuilder
     {
         [MenuItem("Build/All")]
         private static void BuildAll()
