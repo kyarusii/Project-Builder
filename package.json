@@ -1,0 +1,18 @@
+{
+  "name": "com.d-lavender.project-builder",
+  "version": "1.0.0",
+  "displayName": "Project Builder",
+  "description": "This package helps to build binary in various configuration.",
+  "unity": "2021.1",
+  "unityRelease": "0f1",
+  "documentationUrl": "https://github.com/DigitalLavender/Project-Builder/wiki",
+  "changelogUrl": "https://github.com/DigitalLavender/Project-Builder/blob/main/CHANGELOG.md",
+  "licenseUrl": "https://github.com/DigitalLavender/Project-Builder/blob/main/LICENSE",
+  "dependencies": {},
+  "keywords": [],
+  "author": {
+    "name": "Seonghwan",
+    "email": "seonghwan-dev",
+    "url": "https://github.com/seonghwan-dev"
+  }
+}
