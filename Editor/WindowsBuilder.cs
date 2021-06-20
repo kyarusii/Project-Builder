@@ -62,7 +62,7 @@ namespace ProjectBuilder.Editor
         {
             bool isRelease = shippingType == eShippingType.RELEASE;
             bool isHeadless = buildType == eBuildType.HEADLESS;
-            bool isIL2CPP = backend == eBackendType.IL2CPP;
+            bool isIL2CPP = backend != eBackendType.MONO;
             bool isExportSolution = backend == eBackendType.IL2CPP_SOLUTION;
             
             PlayerSettings.SetScriptingBackend(EditorUserBuildSettings.selectedBuildTargetGroup, isIL2CPP ? ScriptingImplementation.IL2CPP : ScriptingImplementation.Mono2x);
