@@ -1,6 +1,6 @@
 {
   "name": "com.d-lavender.project-builder",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "displayName": "Project Builder",
   "description": "This package helps to build binary in various configuration.",
   "unity": "2021.1",
@@ -9,10 +9,25 @@
   "changelogUrl": "https://github.com/DigitalLavender/Project-Builder/blob/main/CHANGELOG.md",
   "licenseUrl": "https://github.com/DigitalLavender/Project-Builder/blob/main/LICENSE",
   "dependencies": {},
-  "keywords": [],
   "author": {
     "name": "Seonghwan",
-    "email": "seonghwan-dev",
+    "email": "seonghwan@pm.me",
     "url": "https://github.com/seonghwan-dev"
-  }
+  },
+  "unity": "2019.3",
+  "homepage": "https://github.com/DigitalLavender/Project-Builder",
+  "bugs": {
+    "url": "https://github.com/DigitalLavender/Project-Builder/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com:DigitalLavender/Project-Builder.git"
+  },
+  "license":"MIT",
+  "keywords": [
+    "shadergraph",
+    "shortcut",
+    "utility",
+    "unity"
+  ]
 }

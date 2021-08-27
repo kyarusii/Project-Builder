@@ -3,27 +3,8 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace ProjectBuilder.Editor
+namespace ProjectBuilder
 {
-    public enum eBackendType
-    {
-        MONO,
-        IL2CPP,
-        IL2CPP_SOLUTION,
-    }
-
-    public enum eShippingType
-    {
-        RELEASE,
-        DEVELOPMENT,
-    }
-
-    public enum eBuildType
-    {
-        CLIENT,
-        HEADLESS,
-    }
-    
     public static class WindowsBuilder
     {
         [MenuItem("Build/All")]
@@ -65,7 +46,8 @@ namespace ProjectBuilder.Editor
             bool isIL2CPP = backend != eBackendType.MONO;
             bool isExportSolution = backend == eBackendType.IL2CPP_SOLUTION;
             
-            PlayerSettings.SetScriptingBackend(EditorUserBuildSettings.selectedBuildTargetGroup, isIL2CPP ? ScriptingImplementation.IL2CPP : ScriptingImplementation.Mono2x);
+            PlayerSettings.SetScriptingBackend(EditorUserBuildSettings.selectedBuildTargetGroup, 
+                isIL2CPP ? ScriptingImplementation.IL2CPP : ScriptingImplementation.Mono2x);
             
             BuildOptions option = (isRelease ? BuildOptions.None : BuildOptions.Development);
             if (isHeadless)
