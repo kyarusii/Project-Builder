@@ -114,7 +114,7 @@ namespace ProjectBuilder
 							? StandaloneBuildSubtarget.Server
 							: StandaloneBuildSubtarget.Player;
 
-						var scenePaths = profile.m_scenes.Select(e => e.name).ToArray();
+						var scenePaths = profile.m_scenes.Select(AssetDatabase.GetAssetPath).ToArray();
 					
 						string subPath = (profile.m_scriptingBackend == ScriptingImplementation.IL2CPP ? "IL2CPP" : "MONO") + "_" +
 						                 (!profile.m_development ? "RELEASE" : "DEVELOPMENT") + "_" +

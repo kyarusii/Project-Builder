@@ -19,5 +19,15 @@ namespace ProjectBuilder
 		public ApiCompatibilityLevel m_compatibilityLevel;
 		
 		public List<string> m_scriptingDefineSymbols;
+
+		[ContextMenu("Print Path")]
+		private void PrintData()
+		{
+			foreach (SceneAsset scene in m_scenes)
+			{
+				Debug.Log(scene.name);
+				Debug.Log(AssetDatabase.GetAssetPath(scene));
+			}
+		}
 	}
 }
