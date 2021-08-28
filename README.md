@@ -8,7 +8,7 @@
 ```json
 {
     "dependencies": {
-        "kr.lavender.project-builder": "1.1.0"
+        "kr.seonghwan.project-builder": "1.1.0"
     }
 }
 ```
@@ -17,10 +17,10 @@
 {
     "scopedRegistries": [
         {
-            "name": "Lavender",
+            "name": "npm-seonghwan",
             "url": "https://registry.npmjs.org",
             "scopes": [
-                "kr.lavender"
+                "kr.seonghwan"
             ]
         }
     ]

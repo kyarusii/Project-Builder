@@ -1,13 +1,14 @@
 {
-  "name": "kr.lavender.project-builder",
+  "name": "kr.seonghwan.project-builder",
   "version": "1.1.0",
   "displayName": "Project Builder",
   "description": "This package helps to build binary in various configuration.",
   "unity": "2021.1",
   "unityRelease": "0f1",
-  "documentationUrl": "https://github.com/DigitalLavender/Project-Builder/wiki",
-  "changelogUrl": "https://github.com/DigitalLavender/Project-Builder/blob/main/CHANGELOG.md",
-  "licenseUrl": "https://github.com/DigitalLavender/Project-Builder/blob/main/LICENSE",
+  "documentationUrl": "https://github.com/seonghwan-dev/Project-Builder/wiki",
+  "changelogUrl": "https://github.com/seonghwan-dev/Project-Builder/blob/main/CHANGELOG.md",
+  "licenseUrl": "https://github.com/seonghwan-dev/Project-Builder/blob/main/LICENSE",
+  "licenses": "MIT",
   "dependencies": {},
   "author": {
     "name": "Seonghwan",
@@ -15,13 +16,13 @@
     "url": "https://github.com/seonghwan-dev"
   },
   "unity": "2019.3",
-  "homepage": "https://github.com/DigitalLavender/Project-Builder",
+  "homepage": "https://github.com/seonghwan-dev/Project-Builder",
   "bugs": {
-    "url": "https://github.com/DigitalLavender/Project-Builder/issues"
+    "url": "https://github.com/seonghwan-dev/Project-Builder/issues"
   },
   "repository": {
     "type": "git",
-    "url": "ssh://git@github.com:DigitalLavender/Project-Builder.git"
+    "url": "ssh://git@github.com:seonghwan-dev/Project-Builder.git"
   },
   "license":"MIT",
   "keywords": [
