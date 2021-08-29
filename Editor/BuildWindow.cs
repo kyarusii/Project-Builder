@@ -13,7 +13,7 @@ namespace ProjectBuilder
 		public int value;
 		public List<BuildCollection> collections = new List<BuildCollection>();
 
-		[MenuItem("Tools/Project Builder Window")]
+		[MenuItem("Build/Project Builder Window")]
 		private static void OpenWindow()
 		{
 			BuildWindow window = GetWindow<BuildWindow>();
