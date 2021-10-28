@@ -276,8 +276,13 @@ namespace ProjectBuilder
 					
 					if (GUILayout.Button("Create", GUILayout.Height(20), GUILayout.Width(100)))
 					{
+						if (!Directory.Exists("Assets/Editor Default Resources"))
+						{
+							Directory.CreateDirectory("Assets/Editor Default Resources");
+						}
+						
 						string path = EditorUtility.SaveFilePanelInProject($"Create {nameof(BuildProfile)}",
-							$"My{nameof(BuildProfile)}.asset", "asset", "Select path to save");
+							$"My{nameof(BuildProfile)}.asset", "asset", "Select path to save", "Assets/Editor Default Resources");
 						
 						if (!string.IsNullOrWhiteSpace(path))
 						{
@@ -354,8 +359,13 @@ namespace ProjectBuilder
 
 				if (GUILayout.Button("Create", GUILayout.Height(20), GUILayout.Width(100)))
 				{
+					if (!Directory.Exists("Assets/Editor Default Resources"))
+					{
+						Directory.CreateDirectory("Assets/Editor Default Resources");
+					}
+
 					string path = EditorUtility.SaveFilePanelInProject($"Create {nameof(BuildProfile)}",
-						$"My{nameof(BuildProfile)}.asset", "asset", "Select path to save");
+						$"My{nameof(BuildProfile)}.asset", "asset", "Path to save", "Assets/Editor Default Resources");
 						
 					if (!string.IsNullOrWhiteSpace(path))
 					{
