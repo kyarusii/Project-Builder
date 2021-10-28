@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using UnityEditor;
-using UnityEditor.Build;
-using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Object = UnityEngine.Object;
@@ -27,7 +24,6 @@ namespace ProjectBuilder
 		private GUIStyle activeProfileStyle;
 		private GUIStyle inactiveProfileStyle;
 
-		private List<BuildProfile> trackedProfiles = default;
 		private Vector2 profilesScrollPos;
 		private Vector2 trackedProfilesScrollPos;
 
@@ -94,7 +90,7 @@ namespace ProjectBuilder
 			editor = Editor.CreateEditor(this);
 			collection = GetLastCollection();
 			
-			CollectProfiles();
+			BuilderData.UpdateProfiles();
 		}
 
 		private void OnDisable()
@@ -199,9 +195,10 @@ namespace ProjectBuilder
 					EditorGUILayout.LabelField("Build Profile");
 				}
 				
-				for (int i = 0; i < collection.profiles.Count; i++)
+				for (int i = 0; i < collection.configurations.Count; i++)
 				{
-					BuildProfile profile = collection.profiles[i];
+					var config = collection.configurations[i];
+					BuildProfile profile = collection.configurations[i].profile;
 					using (new EditorGUILayout.HorizontalScope(GUILayout.Height(20)))
 					{
 						if (profile == null)
@@ -211,31 +208,31 @@ namespace ProjectBuilder
 								GUILayout.Button("Enabled", activeProfileStyle, GUILayout.Width(80));
 							}
 							
-							collection.profiles[i] =
+							collection.configurations[i].profile =
 								EditorGUILayout.ObjectField(profile, typeof(BuildProfile), false) as BuildProfile;
 
-							if (collection.profiles[i] != null)
+							if (collection.configurations[i] != null)
 							{
 								EditorUtility.SetDirty(collection);
 							}
 							
 							if (GUILayout.Button("X", GUILayout.Width(20)))
 							{
-								collection.profiles.RemoveAt(i);
+								collection.configurations.RemoveAt(i);
 								EditorUtility.SetDirty(collection);
 							}
 							
 							continue;
 						}
 						
-						string label = profile.m_isActive ? "Enabled" : "Disabled";
-						var style = profile.m_isActive ? activeProfileStyle : inactiveProfileStyle;
+						string label = config.isActive ? "Enabled" : "Disabled";
+						var style = config.isActive ? activeProfileStyle : inactiveProfileStyle;
 
 						bool pushed = GUILayout.Button(label, style, GUILayout.Width(80));
 						if (pushed)
 						{
-							profile.m_isActive = !profile.m_isActive;
-							EditorUtility.SetDirty(profile);
+							config.isActive = !config.isActive;
+							EditorUtility.SetDirty(collection);
 						}
 
 						BuildProfile changedProfile =
@@ -243,7 +240,7 @@ namespace ProjectBuilder
 						
 						if (!ReferenceEquals(profile, changedProfile))
 						{
-							collection.profiles[i] = changedProfile;
+							collection.configurations[i].profile = changedProfile;
 							EditorUtility.SetDirty(collection);
 						}
 						
@@ -258,13 +255,12 @@ namespace ProjectBuilder
 						
 						if (GUILayout.Button("X", GUILayout.Width(20)))
 						{
-							collection.profiles.RemoveAt(i);
+							collection.configurations.RemoveAt(i);
 							EditorUtility.SetDirty(collection);
 						}
 					}
 				}
 
-				
 				EditorGUILayout.EndScrollView();
 
 				EditorGUILayout.Space(10);
@@ -274,7 +270,10 @@ namespace ProjectBuilder
 					
 					if (GUILayout.Button("Add", GUILayout.Height(20), GUILayout.Width(100)))
 					{
-						collection.profiles.Add(null);
+						collection.configurations.Add(new ProfileConfiguration()
+						{
+							isActive = false,
+						});
 						EditorUtility.SetDirty(collection);
 					}
 					
@@ -293,7 +292,12 @@ namespace ProjectBuilder
 							BuildProfile newProfile = CreateInstance<BuildProfile>();
 							AssetDatabase.CreateAsset(newProfile, path);
 
-							collection.profiles.Add(newProfile);
+							collection.configurations.Add(new ProfileConfiguration()
+							{
+								isActive = true,
+								profile = newProfile,
+							});
+							
 							EditorUtility.SetDirty(collection);
 						}
 					}
@@ -318,13 +322,13 @@ namespace ProjectBuilder
 				GUILayout.MaxHeight(maxHeight),
 				GUILayout.MinHeight(minHeight));
 			
-			foreach (BuildProfile profile in trackedProfiles)
+			foreach (BuildProfile profile in BuilderData.Profiles)
 			{
 				bool disabled = true;
 				if (collection == null) { }
 				else
 				{
-					disabled = collection.profiles.Contains(profile);
+					disabled = collection.configurations.Select(e => e.profile).Contains(profile);
 				}
 
 				using (new EditorGUILayout.HorizontalScope())
@@ -351,7 +355,13 @@ namespace ProjectBuilder
 						if (GUILayout.Button("Add", GUILayout.Width(40)))
 						{
 							Assert.IsNotNull(collection);
-							collection.profiles.Add(profile);
+							collection.configurations.Add(new ProfileConfiguration()
+							{
+								isActive = true,
+								profile = profile,
+							});
+							
+							EditorUtility.SetDirty(collection);
 						}
 					}
 				}
@@ -379,7 +389,7 @@ namespace ProjectBuilder
 						AssetDatabase.CreateAsset(newProfile, path);
 						AssetDatabase.SaveAssets();
 						
-						CollectProfiles();
+						BuilderData.UpdateProfiles();
 					}
 				}
 			}
@@ -401,10 +411,11 @@ namespace ProjectBuilder
 				if (collection == null) { }
 				else
 				{
-					var count = collection.profiles.Count(e => e != null && e.m_isActive);
+					var count = collection.configurations.Count(e => e != null && e.isActive);
+					
 					EditorGUILayout.LabelField($"Status : Ready to build {count} profiles.");
 
-					using (new EditorGUI.DisabledScope(count > 0))
+					using (new EditorGUI.DisabledScope(count < 1))
 					{
 						using (new EditorGUILayout.HorizontalScope())
 						{
@@ -437,14 +448,6 @@ namespace ProjectBuilder
 				inProgress = false;
 			}
 			finally { }
-		}
-
-		private void CollectProfiles()
-		{
-			trackedProfiles = AssetDatabase.FindAssets($"t:{nameof(BuildProfile)}")
-				.Select(AssetDatabase.GUIDToAssetPath)
-				.Select(AssetDatabase.LoadAssetAtPath<BuildProfile>)
-				.ToList();
 		}
 
 		[MenuItem("Window/Project Builder Wizard")]
@@ -500,7 +503,8 @@ namespace ProjectBuilder
 						                 (!profile.m_development ? "RELEASE" : "DEVELOPMENT") + "_" +
 						                 (profile.m_headless ? "HEADLESS" : "CLIENT");
 					
-						string targetPath = Application.dataPath.Replace("/Assets", $"/Build/Windows64/{subPath}/{PlayerSettings.productName}.exe");
+						// string targetPath = Application.dataPath.Replace("/Assets", $"/Build/Windows64/{subPath}/{PlayerSettings.productName}.exe");
+						string targetPath = profile.GetBuildPath();
 
 						string dir = Path.GetDirectoryName(targetPath);
 						Directory.CreateDirectory(dir);
@@ -525,12 +529,26 @@ namespace ProjectBuilder
 			var currentTarget = EditorUserBuildSettings.selectedBuildTargetGroup;
 			string symbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(currentTarget);
 			
-			foreach (var profile in collection.profiles)
+			foreach (var config in collection.configurations)
 			{
+				var profile = config.profile;
+				
+				if (!config.isActive) continue;
 				if (profile == null) continue;
 
 				try
 				{
+					// 현재는 윈도우 플랫폼만 적용
+					if (profile.m_buildTargetGroup == BuildTargetGroup.Standalone)
+					{
+						EditorUserBuildSettings.selectedBuildTargetGroup = profile.m_buildTargetGroup;
+					}
+					else
+					{
+						Debug.LogError("Not Implemented Platform");
+						return;
+					}
+					
 					string current_backend = symbols + ";";
 					
 					// 커스텀 심볼 추가
@@ -563,11 +581,16 @@ namespace ProjectBuilder
 						(!profile.m_development ? "RELEASE" : "DEVELOPMENT") + "_" +
 						(profile.m_headless ? "HEADLESS" : "CLIENT");
 
-					string targetPath = Application.dataPath.Replace("/Assets",
-						$"/Build/Windows64/{subPath}/{PlayerSettings.productName}.exe");
+					// string targetPath = Application.dataPath.Replace("/Assets",
+					// 	$"/Build/Windows64/{subPath}/{PlayerSettings.productName}.exe");
+
+					string targetPath = profile.GetBuildPath();
 
 					string dir = Path.GetDirectoryName(targetPath);
-					Directory.CreateDirectory(dir);
+					if (!string.IsNullOrWhiteSpace(dir))
+					{
+						Directory.CreateDirectory(dir);
+					}
 
 					Debug.Log(dir);
 

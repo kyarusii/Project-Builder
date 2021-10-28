@@ -14,6 +14,11 @@
 ### 1.2.3
 - OpenPropertyEditor 는 2021.1부터 사용 가능
 
+### 1.2.4
+- Active는 컬렉션에 저장
+- ExposeToWizard 기능구현
+- 프로필에서 빌드 경로 지정 가능
+
 ## 1.1.0
 
 - `BuildProfile` 프로필 형태로 설정 저장

@@ -8,6 +8,6 @@ namespace ProjectBuilder
 	[CreateAssetMenu(menuName ="Build/Build Collection", order = 42)]
 	public class BuildCollection : ScriptableObject
 	{
-		public List<BuildProfile> profiles = new List<BuildProfile>();
+		public List<ProfileConfiguration> configurations = new List<ProfileConfiguration>();
 	}
 }

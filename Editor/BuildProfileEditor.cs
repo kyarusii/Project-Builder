@@ -19,9 +19,12 @@ namespace ProjectBuilder
 		private SerializedProperty m_Headless;
 		private SerializedProperty m_Development;
 		
+		private SerializedProperty m_BuildTargetGroup;
 		private SerializedProperty m_ScriptingBackend;
 		private SerializedProperty m_APICompatibilityLevel;
 		private SerializedProperty m_ScriptingDefineSymbols;
+		
+		private SerializedProperty m_BuildPath;
 
 		private static Dictionary<ApiCompatibilityLevel, GUIContent> m_NiceApiCompatibilityLevelNames;
 		private string serializedScriptingDefines;
@@ -29,7 +32,7 @@ namespace ProjectBuilder
 		private void OnEnable()
 		{
 			m_ExportToWizard = serializedObject.FindProperty("m_exposeToWizard");
-			m_IsActive = serializedObject.FindProperty("m_isActive");
+			m_BuildPath = serializedObject.FindProperty("m_buildPath");
 			
 			m_Scenes = serializedObject.FindProperty("m_scenes");
 			m_Server = serializedObject.FindProperty("m_server");
@@ -37,6 +40,7 @@ namespace ProjectBuilder
 			m_Headless = serializedObject.FindProperty("m_headless");
 			m_Development = serializedObject.FindProperty("m_development");
 			
+			m_BuildTargetGroup = serializedObject.FindProperty("m_buildTargetGroup");
 			m_APICompatibilityLevel = serializedObject.FindProperty("m_compatibilityLevel");
 			m_ScriptingBackend = serializedObject.FindProperty("m_scriptingBackend");
 			m_ScriptingDefineSymbols = serializedObject.FindProperty("m_scriptingDefineSymbols");
@@ -44,6 +48,7 @@ namespace ProjectBuilder
 
 		public override void OnInspectorGUI()
 		{
+			serializedObject.UpdateIfRequiredOrScript();
 			EditorGUI.BeginChangeCheck();
 		
 			GUILayout.Label(SettingsContent.projectBuilderSettingTitle, EditorStyles.boldLabel);
@@ -51,7 +56,8 @@ namespace ProjectBuilder
 			{
 				EditorGUI.indentLevel++;
 				EditorGUILayout.PropertyField(m_ExportToWizard, new GUIContent("Expose To Wizard"));
-				EditorGUILayout.PropertyField(m_IsActive, new GUIContent("Active"));
+				EditorGUILayout.PropertyField(m_BuildPath, new GUIContent("Build Path"));
+				EditorGUILayout.LabelField(((BuildProfile)target).GetBuildPath());
 				EditorGUI.indentLevel--;
 			}
 			
@@ -81,6 +87,7 @@ namespace ProjectBuilder
 
 			using (new EditorGUI.DisabledScope(EditorApplication.isPlaying))
 			{
+				EditorGUILayout.PropertyField(m_BuildTargetGroup);
 				using (EditorGUILayout.HorizontalScope horizontalScope =
 					new EditorGUILayout.HorizontalScope(Array.Empty<GUILayoutOption>()))
 				{
