@@ -9,6 +9,9 @@ namespace ProjectBuilder
 	[CreateAssetMenu(menuName ="Build/Build Profile", order = 40)]
 	public class BuildProfile : ScriptableObject
 	{
+		public bool m_exposeToWizard = true;
+		public bool m_isActive = true;
+		
 		public List<SceneAsset> m_scenes;
 		public bool m_server;
 		public bool m_client;

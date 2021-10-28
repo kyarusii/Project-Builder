@@ -1,5 +1,10 @@
 # CHANGE LOG
 
+## 1.2.0
+- 패키지 제공자 변경 `kr.calci` -> `com.calci`
+- `2021.2` 이전 버전 대응
+- Build Window 메뉴 이동 `Tools/Project Builder` -> `Window/Project Builder Wizard`
+
 ## 1.1.0
 
 - `BuildProfile` 프로필 형태로 설정 저장
@@ -10,8 +15,6 @@
 
 ### 1.1.1
 - `MenuItem` 이동 `Build`로 통일
-
-
 
 ## 1.0.0
 

@@ -10,6 +10,9 @@ namespace ProjectBuilder
 	[CustomEditor(typeof(BuildProfile))]
 	internal sealed class BuildProfileEditor : UnityEditor.Editor
 	{
+		private SerializedProperty m_ExportToWizard;
+		private SerializedProperty m_IsActive;
+		
 		private SerializedProperty m_Scenes;
 		private SerializedProperty m_Server;
 		private SerializedProperty m_Client;
@@ -25,6 +28,9 @@ namespace ProjectBuilder
 
 		private void OnEnable()
 		{
+			m_ExportToWizard = serializedObject.FindProperty("m_exposeToWizard");
+			m_IsActive = serializedObject.FindProperty("m_isActive");
+			
 			m_Scenes = serializedObject.FindProperty("m_scenes");
 			m_Server = serializedObject.FindProperty("m_server");
 			m_Client = serializedObject.FindProperty("m_client");
@@ -39,12 +45,23 @@ namespace ProjectBuilder
 		public override void OnInspectorGUI()
 		{
 			EditorGUI.BeginChangeCheck();
+		
+			GUILayout.Label(SettingsContent.projectBuilderSettingTitle, EditorStyles.boldLabel);
+			using (new EditorGUI.DisabledScope(EditorApplication.isPlaying))
+			{
+				EditorGUI.indentLevel++;
+				EditorGUILayout.PropertyField(m_ExportToWizard, new GUIContent("Expose To Wizard"));
+				EditorGUILayout.PropertyField(m_IsActive, new GUIContent("Active"));
+				EditorGUI.indentLevel--;
+			}
+			
+			EditorGUILayout.Space();
 			
 			GUILayout.Label(SettingsContent.scriptCompilationTitle, EditorStyles.boldLabel);
 			using (new EditorGUI.DisabledScope(EditorApplication.isPlaying))
 			{
 				EditorGUI.indentLevel++;
-				
+
 				EditorGUILayout.PropertyField(m_Scenes, new GUIContent("Scenes"));
 				EditorGUILayout.Space();
 				
@@ -65,7 +82,7 @@ namespace ProjectBuilder
 			using (new EditorGUI.DisabledScope(EditorApplication.isPlaying))
 			{
 				using (EditorGUILayout.HorizontalScope horizontalScope =
-					new(Array.Empty<GUILayoutOption>()))
+					new EditorGUILayout.HorizontalScope(Array.Empty<GUILayoutOption>()))
 				{
 					using (new EditorGUI.PropertyScope(horizontalScope.rect, GUIContent.none, m_ScriptingBackend))
 					{
@@ -113,6 +130,7 @@ namespace ProjectBuilder
 					GUILayout.FlexibleSpace();
 					if (GUILayout.Button("Import from PlayerSettings"))
 					{
+#if UNITY_2021_2_OR_NEWER
 						NamedBuildTarget current =
 							NamedBuildTarget.FromBuildTargetGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
 						string symbols = PlayerSettings.GetScriptingDefineSymbols(current);
@@ -123,6 +141,18 @@ namespace ProjectBuilder
 							SerializedProperty property = m_ScriptingDefineSymbols.GetArrayElementAtIndex(i);
 							property.stringValue = parsedSymbols[i];
 						}
+#else
+						var currentTarget = EditorUserBuildSettings.selectedBuildTargetGroup;
+						string symbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(currentTarget);
+						string[] parsedSymbols = symbols.Split(';');
+						
+						m_ScriptingDefineSymbols.arraySize = parsedSymbols.Length;
+						for (int i = 0; i < parsedSymbols.Length; i++)
+						{
+							SerializedProperty property = m_ScriptingDefineSymbols.GetArrayElementAtIndex(i);
+							property.stringValue = parsedSymbols[i];
+						}
+#endif
 					}
 				}
 			}
@@ -262,6 +292,9 @@ namespace ProjectBuilder
 
 			public static readonly GUIContent scriptCompilationTitle =
 				EditorGUIUtility.TrTextContent("Script Compilation");
+			
+			public static readonly GUIContent projectBuilderSettingTitle =
+				EditorGUIUtility.TrTextContent("Project Builder Configuration");
 		}
 	}
 }
