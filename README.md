@@ -7,7 +7,7 @@
 ```json
 {
     "dependencies": {
-        "com.calci.projectbuilder": "1.2.2"
+        "com.calci.projectbuilder": "1.2.3"
     }
 }
 ```
@@ -42,7 +42,6 @@
 <p align="center">
 <img src="https://user-images.githubusercontent.com/79823287/139198519-8a37da32-00db-4503-aec6-3bb04531546c.png" width="600">
 </p>
-
 
 ### API
 

@@ -249,7 +249,11 @@ namespace ProjectBuilder
 						
 						if (GUILayout.Button("Edit", GUILayout.Width(40)))
 						{
+#if UNITY_2021_1_OR_NEWER
 							EditorUtility.OpenPropertyEditor(profile);
+#else
+							Selection.objects = new Object[] { profile };
+#endif
 						}
 						
 						if (GUILayout.Button("X", GUILayout.Width(20)))
@@ -329,11 +333,13 @@ namespace ProjectBuilder
 					{
 						EditorGUILayout.ObjectField(profile, typeof(BuildProfile), false);
 					}
-					
+
+#if UNITY_2021_1_OR_NEWER
 					if (GUILayout.Button("Edit", GUILayout.Width(40)))
 					{
 						EditorUtility.OpenPropertyEditor(profile);
 					}
+#endif
 
 					if (GUILayout.Button("Select", GUILayout.Width(60)))
 					{
