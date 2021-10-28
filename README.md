@@ -43,6 +43,19 @@
 <img src="https://user-images.githubusercontent.com/79823287/139198519-8a37da32-00db-4503-aec6-3bb04531546c.png" width="600">
 </p>
 
+### Build Profile
+<p align="center">
+<img src="https://user-images.githubusercontent.com/79823287/139209341-41c8e9cb-4d3e-4635-9783-26dfb3614edc.png" width="600">
+</p>
+
+- `Expose To Wizard` : 비활성화시 프로젝트 단위 검색에서 제외됩니다.  
+- `Build Path` : 미리 지정된 심볼을 이용해 빌드 경로를 지정할 수 있습니다.   
+    - `{ProjectRoot}` : 프로젝트 루트 (Assets 폴더가 위치한 디렉터리로 대체)  
+    - `{Platform}` : 빌드된 플랫폼 (ex. Windows = Standalone)  
+    - `{ProfileName}` : 프로필 이름 (ex. client_il2cpp_release.asset 프로필 = client_il2cpp_release)  
+    - `{ProductName}` : 애플리케이션 이름 (`Application.productName`으로 대체)  
+- `Headless` : 윈도우 플랫폼에서 그래픽스 API를 사용하지 않는 Console 모드로 빌드 (서버 빌드)  
+
 ### API
 
 ```csharp
