@@ -7,7 +7,7 @@
 ```json
 {
     "dependencies": {
-        "com.calci.projectbuilder": "1.2.0"
+        "com.calci.projectbuilder": "1.2.1"
     }
 }
 ```

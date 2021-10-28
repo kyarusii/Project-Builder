@@ -5,6 +5,9 @@
 - `2021.2` 이전 버전 대응
 - Build Window 메뉴 이동 `Tools/Project Builder` -> `Window/Project Builder Wizard`
 
+### 1.2.1
+- Collection Null Ref Exception
+
 ## 1.1.0
 
 - `BuildProfile` 프로필 형태로 설정 저장

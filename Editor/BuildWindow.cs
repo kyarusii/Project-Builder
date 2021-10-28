@@ -278,28 +278,35 @@ namespace ProjectBuilder
 		{
 			try
 			{
-				EditorGUILayout.LabelField($"Status : Ready to build {collection.profiles.Count(e => e != null && e.m_isActive)} profiles.");
-				
-				using (new EditorGUILayout.HorizontalScope())
+				if (collection == null)
 				{
-					GUILayout.FlexibleSpace();
-					if (GUILayout.Button("Build", GUILayout.Width(120), GUILayout.Height(30)))
+					
+				}
+				else
+				{
+					EditorGUILayout.LabelField($"Status : Ready to build {collection.profiles.Count(e => e != null && e.m_isActive)} profiles.");
+				
+					using (new EditorGUILayout.HorizontalScope())
 					{
-						inProgress = true;
-						
-						var title = "Build Wizard";
-						var message = "This process cannot be canceled. Proceed?";
-						var yes = "Proceed";
-						var no = "Abort";
-
-						bool res = EditorUtility.DisplayDialog(title, message, yes, no);
-						if (res)
+						GUILayout.FlexibleSpace();
+						if (GUILayout.Button("Build", GUILayout.Width(120), GUILayout.Height(30)))
 						{
-							Build();
-							inProgress = false;
-						}
-					}	
-					GUILayout.FlexibleSpace();
+							inProgress = true;
+						
+							var title = "Build Wizard";
+							var message = "This process cannot be canceled. Proceed?";
+							var yes = "Proceed";
+							var no = "Abort";
+
+							bool res = EditorUtility.DisplayDialog(title, message, yes, no);
+							if (res)
+							{
+								Build();
+								inProgress = false;
+							}
+						}	
+						GUILayout.FlexibleSpace();
+					}
 				}
 			}
 			catch (Exception e)
