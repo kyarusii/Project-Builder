@@ -40,7 +40,7 @@
 `Window/Project Builder Wizard`
 
 <p align="center">
-<img src="https://user-images.githubusercontent.com/79823287/139193876-8b079be8-f1ec-404f-843b-9a1aa10ce3fd.png" width="600">
+<img src="https://user-images.githubusercontent.com/79823287/139198519-8a37da32-00db-4503-aec6-3bb04531546c.png" width="600">
 </p>
 
 
