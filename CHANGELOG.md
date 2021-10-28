@@ -8,6 +8,9 @@
 ### 1.2.1
 - Collection Null Ref Exception
 
+### 1.2.2
+- 프로필 추가 버튼, 스크롤 뷰로 변경
+
 ## 1.1.0
 
 - `BuildProfile` 프로필 형태로 설정 저장

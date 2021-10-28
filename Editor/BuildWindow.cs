@@ -7,6 +7,8 @@ using UnityEditor;
 using UnityEditor.Build;
 using UnityEditorInternal;
 using UnityEngine;
+using UnityEngine.Assertions;
+using Object = UnityEngine.Object;
 
 namespace ProjectBuilder
 {
@@ -24,6 +26,13 @@ namespace ProjectBuilder
 
 		private GUIStyle activeProfileStyle;
 		private GUIStyle inactiveProfileStyle;
+
+		private List<BuildProfile> trackedProfiles = default;
+		private Vector2 profilesScrollPos;
+		private Vector2 trackedProfilesScrollPos;
+
+		private const float minHeight = 80;
+		private const float maxHeight = 300;
 
 		/// <summary>
 		/// 마지막으로 사용한 빌드 컬렉션을 가져옵니다.
@@ -84,6 +93,8 @@ namespace ProjectBuilder
 		{
 			editor = Editor.CreateEditor(this);
 			collection = GetLastCollection();
+			
+			CollectProfiles();
 		}
 
 		private void OnDisable()
@@ -141,6 +152,7 @@ namespace ProjectBuilder
 
 		private void OnGUI_Single()
 		{
+			// 컬렉션 셀렉터 그리기
 			using (new EditorGUILayout.HorizontalScope(Array.Empty<GUILayoutOption>()))
 			{
 				collection = EditorGUILayout.ObjectField(new GUIContent("Collection"), collection,
@@ -164,16 +176,23 @@ namespace ProjectBuilder
 			
 			EditorGUILayout.Space(20);
 
+			// 컬렉션에 포함된 프로필 리스트 그리기
 			if (collection == null)
 			{
 				EditorGUILayout.HelpBox("Select or create a collection", MessageType.Info);
 			}
 			else
 			{
+				EditorGUILayout.LabelField("Profiles in Collection", EditorStyles.boldLabel);
+				
 				EditorGUILayout.Space(5);
 				EditorGUILayout.BeginVertical("HelpBox");
 				EditorGUILayout.Space(10);
-				
+
+				profilesScrollPos = EditorGUILayout.BeginScrollView(profilesScrollPos, 
+					GUILayout.MaxHeight(maxHeight),
+					GUILayout.MinHeight(minHeight));
+
 				using (new EditorGUILayout.HorizontalScope(Array.Empty<GUILayoutOption>()))
 				{
 					EditorGUILayout.LabelField("Active", GUILayout.Width(80));
@@ -228,6 +247,11 @@ namespace ProjectBuilder
 							EditorUtility.SetDirty(collection);
 						}
 						
+						if (GUILayout.Button("Edit", GUILayout.Width(40)))
+						{
+							EditorUtility.OpenPropertyEditor(profile);
+						}
+						
 						if (GUILayout.Button("X", GUILayout.Width(20)))
 						{
 							collection.profiles.RemoveAt(i);
@@ -235,6 +259,9 @@ namespace ProjectBuilder
 						}
 					}
 				}
+
+				
+				EditorGUILayout.EndScrollView();
 
 				EditorGUILayout.Space(10);
 				using (new EditorGUILayout.HorizontalScope(GUILayout.Height(20)))
@@ -263,10 +290,87 @@ namespace ProjectBuilder
 					}
 				}
 				
+				
 				EditorGUILayout.Space(10);
 				EditorGUILayout.EndVertical();
 				EditorGUILayout.Space(5);
 			}
+			
+			// 컬렉션에 추가할 수 있는 다른 프로필 리스트 그리기
+			EditorGUILayout.Space(10);
+			
+			EditorGUILayout.LabelField("Available Profiles", EditorStyles.boldLabel);
+			
+			EditorGUILayout.Space(5);
+			EditorGUILayout.BeginVertical("HelpBox");
+			EditorGUILayout.Space(10);
+			
+			trackedProfilesScrollPos= EditorGUILayout.BeginScrollView(trackedProfilesScrollPos, 
+				GUILayout.MaxHeight(maxHeight),
+				GUILayout.MinHeight(minHeight));
+			
+			foreach (BuildProfile profile in trackedProfiles)
+			{
+				bool disabled = true;
+				if (collection == null) { }
+				else
+				{
+					disabled = collection.profiles.Contains(profile);
+				}
+
+				using (new EditorGUILayout.HorizontalScope())
+				{
+					using (new EditorGUI.DisabledScope(true))
+					{
+						EditorGUILayout.ObjectField(profile, typeof(BuildProfile), false);
+					}
+					
+					if (GUILayout.Button("Edit", GUILayout.Width(40)))
+					{
+						EditorUtility.OpenPropertyEditor(profile);
+					}
+
+					if (GUILayout.Button("Select", GUILayout.Width(60)))
+					{
+						Selection.objects = new Object[] { profile };
+					}
+
+					using (new EditorGUI.DisabledScope(disabled))
+					{
+						if (GUILayout.Button("Add", GUILayout.Width(40)))
+						{
+							Assert.IsNotNull(collection);
+							collection.profiles.Add(profile);
+						}
+					}
+				}
+			}
+			EditorGUILayout.EndScrollView();
+
+			EditorGUILayout.Space(10);
+			using (new EditorGUILayout.HorizontalScope(GUILayout.Height(20)))
+			{
+				GUILayout.FlexibleSpace();
+
+				if (GUILayout.Button("Create", GUILayout.Height(20), GUILayout.Width(100)))
+				{
+					string path = EditorUtility.SaveFilePanelInProject($"Create {nameof(BuildProfile)}",
+						$"My{nameof(BuildProfile)}.asset", "asset", "Select path to save");
+						
+					if (!string.IsNullOrWhiteSpace(path))
+					{
+						BuildProfile newProfile = CreateInstance<BuildProfile>();
+						AssetDatabase.CreateAsset(newProfile, path);
+						AssetDatabase.SaveAssets();
+						
+						CollectProfiles();
+					}
+				}
+			}
+
+			EditorGUILayout.Space(10);
+			EditorGUILayout.EndVertical();
+			EditorGUILayout.Space(5);
 		}
 
 		private void OnGUI_Multi()
@@ -278,34 +382,36 @@ namespace ProjectBuilder
 		{
 			try
 			{
-				if (collection == null)
-				{
-					
-				}
+				if (collection == null) { }
 				else
 				{
-					EditorGUILayout.LabelField($"Status : Ready to build {collection.profiles.Count(e => e != null && e.m_isActive)} profiles.");
-				
-					using (new EditorGUILayout.HorizontalScope())
-					{
-						GUILayout.FlexibleSpace();
-						if (GUILayout.Button("Build", GUILayout.Width(120), GUILayout.Height(30)))
-						{
-							inProgress = true;
-						
-							var title = "Build Wizard";
-							var message = "This process cannot be canceled. Proceed?";
-							var yes = "Proceed";
-							var no = "Abort";
+					var count = collection.profiles.Count(e => e != null && e.m_isActive);
+					EditorGUILayout.LabelField($"Status : Ready to build {count} profiles.");
 
-							bool res = EditorUtility.DisplayDialog(title, message, yes, no);
-							if (res)
+					using (new EditorGUI.DisabledScope(count > 0))
+					{
+						using (new EditorGUILayout.HorizontalScope())
+						{
+							GUILayout.FlexibleSpace();
+							if (GUILayout.Button("Build", GUILayout.Width(120), GUILayout.Height(30)))
 							{
-								Build();
-								inProgress = false;
+								inProgress = true;
+
+								var title = "Build Wizard";
+								var message = "This process cannot be canceled. Proceed?";
+								var yes = "Proceed";
+								var no = "Abort";
+
+								bool res = EditorUtility.DisplayDialog(title, message, yes, no);
+								if (res)
+								{
+									Build();
+									inProgress = false;
+								}
 							}
-						}	
-						GUILayout.FlexibleSpace();
+
+							GUILayout.FlexibleSpace();
+						}
 					}
 				}
 			}
@@ -314,23 +420,25 @@ namespace ProjectBuilder
 				Debug.LogException(e);
 				inProgress = false;
 			}
-			finally
-			{
-				
-			}
+			finally { }
 		}
 
-		private async void BuildCheck()
+		private void CollectProfiles()
 		{
-			await Task.Delay(2000);
-			inProgress = false;
+			trackedProfiles = AssetDatabase.FindAssets($"t:{nameof(BuildProfile)}")
+				.Select(AssetDatabase.GUIDToAssetPath)
+				.Select(AssetDatabase.LoadAssetAtPath<BuildProfile>)
+				.ToList();
 		}
 
 		[MenuItem("Window/Project Builder Wizard")]
 		private static void OpenWindow()
 		{
 			BuildWindow window = GetWindow<BuildWindow>();
+			
 			window.titleContent = new GUIContent("Project Builder");
+			window.minSize = new Vector2(400, 600);
+
 			window.Show();
 		}
 
