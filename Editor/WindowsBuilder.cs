@@ -7,7 +7,9 @@ namespace ProjectBuilder
 {
     public static class WindowsBuilder
     {
+#if PB_MENUITEM
         [MenuItem("Build/All")]
+#endif
         private static void BuildAll()
         {
             BuildPlayer(eBackendType.MONO, eBuildType.HEADLESS, eShippingType.RELEASE);
@@ -21,7 +23,9 @@ namespace ProjectBuilder
             BuildPlayer(eBackendType.IL2CPP, eBuildType.CLIENT, eShippingType.DEVELOPMENT);
         }
         
+#if PB_MENUITEM
         [MenuItem("Build/Headless")]
+#endif
         private static void BuildHeadless()
         {
             BuildPlayer(eBackendType.MONO, eBuildType.HEADLESS, eShippingType.RELEASE);
@@ -30,7 +34,9 @@ namespace ProjectBuilder
             BuildPlayer(eBackendType.IL2CPP, eBuildType.HEADLESS, eShippingType.DEVELOPMENT);
         }
         
+#if PB_MENUITEM
         [MenuItem("Build/Client")]
+#endif
         private static void BuildClient()
         {
             BuildPlayer(eBackendType.MONO, eBuildType.CLIENT, eShippingType.RELEASE);
@@ -59,8 +65,7 @@ namespace ProjectBuilder
             {
                 
             }
-            
-            
+
             string[] scenePaths = UnityEditor.EditorBuildSettings.scenes
                 .Select(x => x.path).ToArray();
 
